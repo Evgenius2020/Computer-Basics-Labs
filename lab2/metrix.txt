@@ -1,0 +1,7 @@
+-O0 - 43.51 sec
+-O1 - 42.84 sec
+-O2 - 42.94 sec
+-O3 - 42.64 sec
+-Ofast - 39.71 sec
+-Os - 42.96 sec
+-Og - 45.18 sec

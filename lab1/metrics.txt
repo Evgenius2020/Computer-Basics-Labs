@@ -1,0 +1,40 @@
+---clock_gettime---
+Time taken: 16.524382 sec.
+Time taken: 16.340658 sec.
+Time taken: 16.380974 sec.
+Time taken: 16.376844 sec.
+Time taken: 16.643797 sec.
+
+---rdtsc---
+Time taken: 16.500998 sec.
+Time taken: 16.453129 sec.
+Time taken: 16.426159 sec.
+Time taken: 16.843311 sec.
+Time taken: 17.219916 sec.
+
+---times---
+Time taken: 16.440000 sec.
+Time taken: 16.420000 sec.
+Time taken: 17.270000 sec.
+Time taken: 16.590000 sec.
+Time taken: 16.380000 sec.
+
+---time---
+
+# time ./times
+Time taken: 16.710000 sec.
+real	0m16.346s
+user	0m16.344s
+sys		0m0.000s
+
+# time ./rdtsc
+Time taken: 16.722099 sec.
+real	0m16.753s
+user	0m16.760s
+sys		0m0.000s
+
+# time ./clock_gettime
+Time taken: 16.356129 sec.
+real	0m16.354s
+user	0m16.344s
+sys		0m0.000s
