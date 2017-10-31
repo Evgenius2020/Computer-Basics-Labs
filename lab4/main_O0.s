@@ -29,8 +29,8 @@ powerMinusOne:
 	ldrd	r3, [r7]
 	mov	r1, #1
 	mov	r2, #0
-	and	r3, r3, r1
-	and	r4, r4, r2
+	and	r3, r3, r1			; r3 = r3 & r1
+	and	r4, r4, r2			; r4 = r4 & r1
 	orrs	r3, r3, r4
 	bne	.L2
 	mov	r3, #1065353216
@@ -39,8 +39,8 @@ powerMinusOne:
 	mov	r3, #0
 	movt	r3, 49024
 .L3:
-	vmov	s15, r3
-	vmov.f32	s0, s15
+	vmov	s15, r3			;; r3 - returning value
+	vmov.f32	s0, s15		;
 	adds	r7, r7, #8
 	mov	sp, r7
 	@ sp needed
@@ -61,23 +61,23 @@ getNthElement:
 	vpush.64	{d8}
 	sub	sp, sp, #12
 	add	r7, sp, #0
-	strd	r0, [r7]
-	ldrd	r0, [r7]
-	bl	powerMinusOne
-	vmov.f32	s14, s0
-	vmov.f32	s15, #4.0e+0
-	vmul.f32	s16, s14, s15
-	ldrd	r3, [r7]
-	adds	r3, r3, r3
-	adc	r4, r4, r4
-	adds	r3, r3, #1
+	strd	r0, [r7]			;; (strange) n from args
+	ldrd	r0, [r7]			;
+	bl	powerMinusOne			;; s0 = powerMinusOne(n)
+	vmov.f32	s14, s0			;; s16 = left bracket 
+	vmov.f32	s15, #4.0e+0	;
+	vmul.f32	s16, s14, s15	;
+	ldrd	r3, [r7]			;; n + n ; (2*n)
+	adds	r3, r3, r3			;
+	adc	r4, r4, r4				
+	adds	r3, r3, #1			;; 2n + 1
 	adc	r4, r4, #0
 	mov	r0, r3
 	mov	r1, r4
-	bl	__aeabi_l2f
-	vmov	s14, r0
-	vdiv.f32	s15, s16, s14
-	vmov.f32	s0, s15
+	bl	__aeabi_l2f 
+	vmov	s14, r0				;; s14 = 2n + 1
+	vdiv.f32	s15, s16, s14	;; s15 = s16 / s14
+	vmov.f32	s0, s15			; s0 - returning value
 	adds	r7, r7, #12
 	mov	sp, r7
 	@ sp needed
@@ -97,32 +97,32 @@ picalculate:
 	sub	sp, sp, #20
 	add	r7, sp, #0
 	mov	r3, #0
-	str	r3, [r7, #4]	@ float
-	mov	r3, #0
-	mov	r4, #0
+	str	r3, [r7, #4]	@ float	
+	mov	r3, #0					;; n = 0
+	mov	r4, #0					;; pi = 0
 	strd	r3, [r7, #8]
 	b	.L7
 .L8:
-	ldrd	r0, [r7, #8]
-	bl	getNthElement
-	vmov.f32	s14, s0
-	vldr.32	s15, [r7, #4]
-	vadd.f32	s15, s15, s14
-	vstr.32	s15, [r7, #4]
-	ldrd	r3, [r7, #8]
-	adds	r3, r3, #1
-	adc	r4, r4, #0
-	strd	r3, [r7, #8]
+	ldrd	r0, [r7, #8]		;; fuction argument
+	bl	getNthElement			;; s14 = getNthElement
+	vmov.f32	s14, s0			;
+	vldr.32	s15, [r7, #4]		;; s15 += pi ; from s14
+	vadd.f32	s15, s15, s14	;
+	vstr.32	s15, [r7, #4]		;
+	ldrd	r3, [r7, #8]		;; n++
+	adds	r3, r3, #1			; 
+	adc	r4, r4, #0				;
+	strd	r3, [r7, #8]		;
 .L7:
-	ldrd	r3, [r7, #8]
-	adr	r2, .L10
-	ldrd	r1, [r2]
-	cmp	r1, r3
-	sbcs	r3, r2, r4
-	bge	.L8
-	ldr	r3, [r7, #4]	@ float
-	vmov	s15, r3
-	vmov.f32	s0, s15
+	ldrd	r3, [r7, #8]		;; r3 = n
+	adr	r2, .L10				;; gets relative addres of .L10
+	ldrd	r1, [r2]			;; puts into r1 .L10-value
+	cmp	r1, r3					;; if NUMBER_OF_ITERATIONS >= n jmp .L8
+	sbcs	r3, r2, r4			;
+	bge	.L8						;
+	ldr	r3, [r7, #4]	@ float	;; pi as returning value
+	vmov	s15, r3				;
+	vmov.f32	s0, s15			;
 	adds	r7, r7, #20
 	mov	sp, r7
 	@ sp needed
@@ -151,7 +151,7 @@ main:
 	sub	sp, sp, #8
 	add	r7, sp, #0
 	bl	picalculate
-	vstr.32	s0, [r7, #4]
+	vstr.32	s0, [r7, #4]		;; pi = picalculate()
 	vldr.32	s15, [r7, #4]
 	vcvt.f64.f32	d7, s15
 	vmov	r2, r3, d7
