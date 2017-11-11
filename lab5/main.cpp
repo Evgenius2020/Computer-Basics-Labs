@@ -86,19 +86,18 @@ int main(int argc, char *argv[])
         IplImage *frame = cvQueryFrame(capture);
         if (!frame)
             break;
-        IplImage *img;
 
-        img = cvCloneImage(frame);
-        cvShowImage("Anonimous", ic1(img));
-        cvReleaseImage(&img);
-
-        img = cvCloneImage(frame);
-        cvShowImage("3Colours", ic2(cvCloneImage(frame)));
-        cvReleaseImage(&img);
-
-        img = cvCloneImage(frame);
-        cvShowImage("Pixelize", ic3(cvCloneImage(frame)));
-        cvReleaseImage(&img);
+        IplImage *img1 = cvCloneImage(frame);
+        IplImage *img2 = cvCloneImage(frame);
+        IplImage *img3 = cvCloneImage(frame);
+        
+        cvShowImage("Anonimous", ic1(img1));
+        cvShowImage("3Colours", ic2(img2));
+        cvShowImage("Pixelize", ic3(img3));
+        
+        cvReleaseImage(&img1);
+        cvReleaseImage(&img2);
+        cvReleaseImage(&img3);
 
         char c = cvWaitKey(33);
         if (c == 27)
