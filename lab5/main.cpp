@@ -76,8 +76,21 @@ IplImage *ic3(IplImage *image)
     return image;
 }
 
+#include <stdint.h>
+
 int main(int argc, char *argv[])
 {
+    union ticks {
+        uint64_t t64;
+        struct s32
+        {
+            uint32_t th, tl;
+        } t32;
+    } start, end;
+    double cpu_Hz = 2.1e9;
+    long long total_clocks = 0;
+    long long total_frames = 0;
+
     CvCapture *capture = cvCreateCameraCapture(0);
     if (!capture)
         return 0;
@@ -87,14 +100,20 @@ int main(int argc, char *argv[])
         if (!frame)
             break;
 
-        IplImage *img1 = cvCloneImage(frame);
-        IplImage *img2 = cvCloneImage(frame);
-        IplImage *img3 = cvCloneImage(frame);
-        
-        cvShowImage("Anonimous", ic1(img1));
-        cvShowImage("3Colours", ic2(img2));
-        cvShowImage("Pixelize", ic3(img3));
-        
+        total_frames++;
+        asm("rdtsc\n"
+            : "=a"(start.t32.th), "=d"(start.t32.tl));
+        IplImage *img1 = ic1(cvCloneImage(frame));
+        IplImage *img2 = ic2(cvCloneImage(frame));
+        IplImage *img3 = ic3(cvCloneImage(frame));
+        asm("rdtsc\n"
+            : "=a"(end.t32.th), "=d"(end.t32.tl));
+        total_clocks += end.t64 - start.t64;
+
+        cvShowImage("Anonimous", img1);
+        cvShowImage("3Colours", img2);
+        cvShowImage("Pixelize", img3);
+
         cvReleaseImage(&img1);
         cvReleaseImage(&img2);
         cvReleaseImage(&img3);
@@ -106,6 +125,8 @@ int main(int argc, char *argv[])
     cvReleaseCapture(&capture);
     cvDestroyWindow("Anonimous");
     cvDestroyWindow("3Colours");
+    cvDestroyWindow("3Pixelize");
+    printf("Total frames = %lli(~%lli sec), Calculation Time = %lli clocks (~%f sec)\n", total_frames, total_frames / (1000 / 33), total_clocks, total_clocks / cpu_Hz);
 }
 
 // cmake .
