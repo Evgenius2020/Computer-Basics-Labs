@@ -21,8 +21,7 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ],
-            "preLaunchTask": "xmmintrin_build"
+            ]
         }
     ]
 }

@@ -8,6 +8,12 @@
             "type": "shell",
             "command": "clang -O0 -ggdb3 ./xmmintrin.c",
             "group": "build"
+        },
+        {
+            "label": "gccsse_build",
+            "type": "shell",
+            "command": "gcc -O0 -msse2 -ggdb3 ./gccsse.c",
+            "group": "build"
         }
     ]
 }
