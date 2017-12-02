@@ -6,13 +6,19 @@
         {
             "label": "xmmintrin_build",
             "type": "shell",
-            "command": "clang -O0 -ggdb3 ./xmmintrin.c",
+            "command": "clang -O0 -ggdb3 ./examples/xmmintrin.c",
             "group": "build"
         },
         {
             "label": "gccsse_build",
             "type": "shell",
-            "command": "gcc -O0 -msse2 -ggdb3 ./gccsse.c",
+            "command": "gcc -O0 -msse2 -ggdb3 ./examples/gccsse.c",
+            "group": "build"
+        },
+        {
+            "label": "no_optimizations",
+            "type": "shell",
+            "command": "gcc -O0 -ggdb3 ./matrix_inversion/no_optimizations.c",
             "group": "build"
         }
     ]
