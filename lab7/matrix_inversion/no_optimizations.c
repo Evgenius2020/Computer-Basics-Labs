@@ -1,7 +1,11 @@
-#define N 3
-#define M 1000
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-static float A[N][N] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+#define N 2048
+#define M 10
+
+static float A[N][N];
 static float elements[M + 1][N][N];
 static float B[N][N];
 static float R[N][N];
@@ -74,8 +78,27 @@ void setMatrix(float matrix[N][N])
 
 int main()
 {
+    union ticks {
+        uint64_t t64;
+        struct s32
+        {
+            uint32_t th, tl;
+        } t32;
+    } start, end;
+    double cpu_Hz = 2.1e9;
     int i, j;
     float q;
+
+    for (i = 0; i < N; i++)
+    {
+        for (j = 0; j < N; j++)
+        {
+            A[i][j] = (float)rand() * 2 - (float)RAND_MAX;
+        }
+    }
+
+    asm("rdtsc\n"
+        : "=a"(start.t32.th), "=d"(start.t32.tl));
     // Calculating q
     float q1 = 0, qinf = 0;
     int s;
@@ -86,7 +109,8 @@ int main()
         {
             s += A[i][j] > 0 ? A[i][j] : -A[i][j];
         }
-        if (s > q1) {
+        if (s > q1)
+        {
             q1 = s;
         }
     }
@@ -98,7 +122,8 @@ int main()
         {
             s += buf[i][j] > 0 ? buf[i][j] : -buf[i][j];
         }
-        if (s > qinf) {
+        if (s > qinf)
+        {
             qinf = s;
         }
     }
@@ -146,5 +171,8 @@ int main()
     }
     matrixMultiply(buf, B);
     setMatrix(AI);
+    asm("rdtsc\n"
+        : "=a"(end.t32.th), "=d"(end.t32.tl));
+    printf("Calculation Time = %f sec\n", (end.t64 - start.t64) / cpu_Hz);
     return 0;
 }

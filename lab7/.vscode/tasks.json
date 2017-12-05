@@ -4,22 +4,37 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "xmmintrin_build",
+            "label": "xmmintrin_example",
             "type": "shell",
-            "command": "clang -O0 -ggdb3 ./examples/xmmintrin.c",
+            "command": "clang -O0 -ggdb3 ./examples/xmmintrin_example.c",
             "group": "build"
         },
         {
-            "label": "gccsse_build",
+            "label": "gccsse_example",
             "type": "shell",
-            "command": "gcc -O0 -msse2 -ggdb3 ./examples/gccsse.c",
+            "command": "gcc -O0 -msse2 -ggdb3 ./examples/gccsse_example.c",
             "group": "build"
         },
         {
             "label": "no_optimizations",
             "type": "shell",
             "command": "gcc -O0 -ggdb3 ./matrix_inversion/no_optimizations.c",
-            "group": "build"
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "gccsse",
+            "type": "shell",
+            "command": "gcc -O0 -ggdb3 -msse2 ./matrix_inversion/gccsse.c",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "blas",
+            "type": "shell",
+            "command": "gcc -O0 -ggdb3 ./matrix_inversion/blas.c `pkg-config --libs --cflags blas`",
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }
