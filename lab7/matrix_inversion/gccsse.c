@@ -4,13 +4,6 @@
 #define N 4
 #define M 10
 
-#define matrix_initialize(m, value) \
-    for (int i = 0; i < N; i++)     \
-        for (int j = 0; j < N; j++) \
-    matrix_setxy(m, i, j, value)
-
-#define abs(value) value > 0 ? value : -value
-
 typedef float __attribute__((vector_size(4 * 4))) vector[N / 4];
 typedef vector matrix[N];
 
@@ -24,9 +17,13 @@ void matrix_setxy(matrix m, int x, int y, float value)
     m[y][x / 4][x % 4] = value;
 }
 
-float vector_getx(vector v, int k)
+float vector_getx(vector v, int x)
 {
-    return v[k / N][k % N];
+    return v[x / N][x % N];
+}
+
+void vector_setx(vector v, int x, float val) {
+    v[x / N][x % N] = val;
 }
 
 void vector_clear(vector v)
@@ -50,6 +47,14 @@ void vector_mult(vector v1, vector v2)
     for (int i = 0; i < N / 4; i++)
     {
         v1[i] *= v2[i];
+    }
+}
+
+void vector_mult_scal(vector v1, float scal)
+{
+    for (int i = 0; i < N / 4; i++)
+    {
+        v1[i] *= scal;
     }
 }
 
@@ -77,39 +82,96 @@ float vector_reduce(vector v)
     return res;
 }
 
-void matrix_multiply(matrix a, matrix b, matrix buf)
+void matrix_transpose(matrix m, matrix buf)
+{
+    for (int i = 0; i < N * N; i++)
+    {
+        matrix_setxy(buf, i % N, i / N, matrix_getxy(m, i / N, i % N));
+    }
+}
+
+void matrix_abs(matrix m, matrix buf)
+{
+    for (int i = 0; i < N * N; i++)
+    {
+        float val = matrix_getxy(m, i / N, i % N);
+        matrix_setxy(buf, i % N, i / N, val >= 0 ? val : -val);
+    }
+}
+
+void matrix_mult_scal(matrix a, matrix buf, float scal) {
+    for (int i = 0; i < N; i++) {
+        vector_assign(buf[i], a[i]);
+        vector_mult_scal(buf[i], scal);
+    }
+}
+
+void matrix_mult(matrix a, matrix b, matrix buf)
 {
     vector curr_line;
+    matrix bT;
+    matrix_transpose(b, bT);
 
     for (int k = 0; k < N; k++)
     {
         for (int i = 0; i < N; i++)
         {
             vector_assign(curr_line, a[k]);
-            vector_mult(curr_line, b[i]);
+            vector_mult(curr_line, bT[i]);
             float reduce = vector_reduce(curr_line);
             matrix_setxy(buf, k, i, reduce);
         }
     }
 }
 
-int main()
+void matrix_sum(matrix a, matrix b, matrix buf)
 {
-    matrix A;
-    for (int i = 0; i < N * N; i++)
-    {
-        matrix_setxy(A, i % N, i / N, i + 1);
+    for (int i = 0; i < N; i++)
+    {   
+        vector_assign(buf[i], a[i]);
+        vector_sum(buf[i], b[i]);
     }
-    matrix buf;
-    matrix_multiply(A, A, buf);
+}
 
+void matrix_print(matrix m)
+{
     for (int i = 0; i < N * N; i++)
     {
-        printf("%e ", matrix_getxy(buf, i % N, i / N));
+        printf("%e ", matrix_getxy(m, i % N, i / N));
         if (!((i + 1) % N))
         {
             printf("\n");
         }
     }
     printf("\n");
+}
+
+float calculate_q(matrix A) {
+    matrix Aabs, AT;
+    matrix_abs(A, Aabs);
+    matrix_transpose(Aabs, AT);
+    float sum, sumT, max = 0, maxT = 0;
+    for (int i = 0; i < N; i++) {
+        sum = vector_reduce(Aabs[i]);
+        if (sum > max) {
+            max = sum;
+        }
+        sumT = vector_reduce(AT[i]);
+        if (sumT > maxT) {
+            maxT = sumT;
+        }
+    }
+    float q = max * maxT;
+}
+
+int main()
+{
+    matrix A, buf;
+    for (int i = 0; i < N * N; i++)
+    {
+        matrix_setxy(A, i % N, i / N, (i + 1) * ((i % 2) ? 1 : -1));
+    }    
+    float q = calculate_q(A);
+
+    matrix_print(buf);
 }
