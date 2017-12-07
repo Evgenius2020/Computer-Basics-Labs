@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 2048
 #define M 10
+#define N 2048
 
-static float A[N][N];
+float A[N][N];
 static float elements[M + 1][N][N];
 static float B[N][N];
 static float R[N][N];
@@ -174,5 +174,14 @@ int main()
     asm("rdtsc\n"
         : "=a"(end.t32.th), "=d"(end.t32.tl));
     printf("Calculation Time = %f sec\n", (end.t64 - start.t64) / cpu_Hz);
+    for (int i = 0; i < N * N; i++)
+    {
+        if (i && !(i % N)) {
+            printf("\n");
+        }
+        printf("%e ", AI[i / N][i % N]);
+    }
+    printf("\n");
+
     return 0;
 }
