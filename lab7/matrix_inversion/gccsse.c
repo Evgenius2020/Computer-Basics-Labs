@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 512
+#define N 2048
 #define M 10
 
 typedef float __attribute__((vector_size(4 * 4))) vector[N / 4];
@@ -15,16 +15,6 @@ float matrix_getxy(matrix m, int x, int y)
 void matrix_setxy(matrix m, int x, int y, float value)
 {
     m[y][x / 4][x % 4] = value;
-}
-
-float vector_getx(vector v, int x)
-{
-    return v[x / N][x % N];
-}
-
-void vector_setx(vector v, int x, float val)
-{
-    v[x / N][x % N] = val;
 }
 
 void vector_clear(vector v)
@@ -67,18 +57,18 @@ void vector_sum(vector v1, vector v2)
     }
 }
 
+vector r_buf;
 float vector_reduce(vector v)
 {
-    vector buf;
-    vector_assign(buf, v);
+    vector_assign(r_buf, v);
     for (int i = 1; i < N / 4; i++)
     {
-        buf[0] += buf[i];
+        r_buf[0] += r_buf[i];
     }
     float res = 0;
     for (int i = 0; i < 4; i++)
     {
-        res += buf[0][i];
+        res += r_buf[0][i];
     }
     return res;
 }
@@ -109,10 +99,11 @@ void matrix_mult_scal(matrix a, matrix buf, float scal)
     }
 }
 
+vector curr_line;
+matrix bT;
+
 void matrix_mult(matrix a, matrix b, matrix buf)
 {
-    vector curr_line;
-    matrix bT;
     matrix_transpose(b, bT);
 
     for (int k = 0; k < N; k++)
@@ -160,9 +151,9 @@ void matrix_print(matrix m)
     printf("\n");
 }
 
+matrix Aabs, AT;
 float calculate_q(matrix A)
 {
-    matrix Aabs, AT;
     matrix_abs(A, Aabs);
     matrix_transpose(Aabs, AT);
     float sum, sumT, max = 0, maxT = 0;
@@ -182,16 +173,17 @@ float calculate_q(matrix A)
     float q = max * maxT;
 }
 
+matrix A, B, BA, R, E, buf, R_degrees, SUM;
+
 int main()
 {
-    matrix A, B, BA, R, E, buf, R_degrees, SUM;
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
         {
             //float rand_val = (float)rand() * 2 - (float)RAND_MAX;
             float rand_val = 1;
-            matrix_setxy(A, j, i, rand_val);
+            matrix_setxy(A, j, i, i == j ? 4 : 0);
         }
     }
     float q = calculate_q(A);
@@ -221,5 +213,5 @@ int main()
     }
 
     matrix_mult(SUM, B, buf);
-    // matrix_print(buf);
+    matrix_print(buf);
 }
