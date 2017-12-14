@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <time.h>
 
-#define K 1
-#define L 2
+#define K 10
+#define L 1000
 
 float calculate_average_time(int *mass, int size)
 {
@@ -40,7 +40,7 @@ float calculate_average_time(int *mass, int size)
 
 void main()
 {
-    int max = 1610612736; /*6mb*/
+    int max = 2097152; /*6mb*/
     int step_size = max / L;
     for (int N = step_size; N <= max; N += step_size)
     {
