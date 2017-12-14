@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 2048
+#define N 8
 #define M 10
 
 typedef float __attribute__((vector_size(4 * 4))) vector[N / 4];
