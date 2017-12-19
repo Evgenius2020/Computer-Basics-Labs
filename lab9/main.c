@@ -22,12 +22,9 @@ float calculate_average_time()
 
     asm("rdtsc\n"
         : "=a"(start.t32.th), "=d"(start.t32.tl));
-    for (int j = 0; j < SIZE / 1000; j++)
+    for (int j = 0; j < SIZE; j++)
     {
-        for (int i = 0; i < 1000; i++)
-        {
             x = mass[x];
-        }
     }
     asm("rdtsc\n"
         : "=a"(end.t32.th), "=d"(end.t32.tl));
